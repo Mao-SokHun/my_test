@@ -1,28 +1,40 @@
-import { apiRequest, isApiEnabled } from './api'
+// ================ Start teacher service ================
+// ? Bridge: Student/Search UI ("Teacher") → backend Mentor API
+// ? Used by: useTeachers, Home, Search — calls searchMentors when VITE_API_URL set
+
+import { isApiEnabled } from './api'
+import { searchMentors, fetchMentorById } from './mentorsApi'
+import { mapMentorToTeacher } from '@/utils/mentorMapper'
 import { filterTeachers } from '@/utils/filterTeachers'
-import { buildQueryString, toTeacherQueryParams } from '@/utils/teacherQuery'
+import { toTeacherQueryParams } from '@/utils/teacherQuery'
 import { teachers as mockTeachers } from '@/constants/mockData'
 
-const ENDPOINTS = {
-  list: '/teachers',
-  byId: (id) => `/teachers/${id}`,
+// ? UI pageSize → backend limit; UI sort labels → backend sort values
+function mapListParams(filters = {}) {
+  const base = toTeacherQueryParams(filters)
+  const params = { ...base }
+  if (base.pageSize) {
+    params.limit = base.pageSize
+    delete params.pageSize
+  }
+  if (base.sort === 'Best Match') params.sort = 'newest'
+  return params
 }
 
+// ? GET /mentors/search — returns { items, total, page, pageSize }
 export async function fetchTeachers(filters = {}) {
-  const params = toTeacherQueryParams(filters)
-  const qs = buildQueryString(params)
-
   if (isApiEnabled()) {
-    const json = await apiRequest(`${ENDPOINTS.list}${qs}`)
-    if (Array.isArray(json)) return { items: json, total: json.length }
+    const data = await searchMentors(mapListParams(filters))
+    const items = (data?.items ?? []).map(mapMentorToTeacher)
     return {
-      items: json.data ?? json.items ?? [],
-      total: json.total ?? json.data?.length ?? 0,
-      page: json.page,
-      pageSize: json.pageSize,
+      items,
+      total: data?.total ?? items.length,
+      page: data?.page,
+      pageSize: data?.limit,
     }
   }
 
+  // ? No VITE_API_URL — use mock data from constants/mockData
   const items = filterTeachers(mockTeachers, filters)
   const page = filters.page ?? 1
   const pageSize = filters.pageSize ?? items.length
@@ -35,9 +47,13 @@ export async function fetchTeachers(filters = {}) {
   }
 }
 
+// ? GET /mentors/:id — one teacher card / profile page
 export async function fetchTeacherById(id) {
   if (isApiEnabled()) {
-    return apiRequest(ENDPOINTS.byId(id))
+    const mentor = await fetchMentorById(id)
+    return mapMentorToTeacher(mentor)
   }
   return mockTeachers.find((t) => String(t.id) === String(id)) ?? null
 }
+
+// ================ End teacher service ================

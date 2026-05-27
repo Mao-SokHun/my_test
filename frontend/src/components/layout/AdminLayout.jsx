@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, Users, BookOpen, BarChart2, Shield,
+  LayoutDashboard, Users, BookOpen, BarChart2, Shield, LayoutList,
   HelpCircle, FileText, Lock, CreditCard, Settings,
   Bell, Search, ChevronDown, Menu, X,
   LogOut, AlertTriangle
@@ -25,6 +25,7 @@ const navGroups = [
       { icon: BookOpen,        labelKey: 'admin.content',         href: '/admin/content' },
       { icon: BarChart2,       labelKey: 'admin.reports',         href: '/admin/reports' },
       { icon: Shield,          labelKey: 'admin.roles',           href: '/admin/roles' },
+      { icon: LayoutList,      labelKey: 'admin.backendTasks',    href: '/admin/backend-tasks' },
     ],
   },
   {

@@ -1,8 +1,22 @@
+// ? Task #1 — save profile: updateMentorProfile → PUT /mentors/:userId (needs rokkru_token)
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useAuth } from '@/hooks'
+import { isApiEnabled } from '@/constants/env'
+import { updateMentorProfile } from '@/services/mentorsApi'
+import { mapTeacherFormToMentorPayload } from '@/utils/mentorMapper'
 import { Camera, Upload, Plus, X } from 'lucide-react'
 import clsx from 'clsx'
-import { PageScaffold, PageCard, TabBar, ExperienceSection, PageAmbient } from '@/components'
+import {
+  PageScaffold,
+  PageCard,
+  TabBar,
+  ExperienceSection,
+  PageAmbient,
+  MentorPortfolioSection,
+  MentorSkillsSection,
+  MentorPostsSection,
+} from '@/components'
 import Select from '../../components/ui/Select'
 
 const GENDERS = ['Male', 'Female', 'Other']
@@ -15,7 +29,14 @@ const MOCK_EXPERIENCE = [
 
 const EditProfile = () => {
   const navigate = useNavigate()
-  const [tab, setTab] = useState('detail')
+  const [searchParams] = useSearchParams()
+  const { user } = useAuth()
+  const mentorUserId = user?.user_id ?? user?.id
+  const initialTab = searchParams.get('tab')
+  const [tab, setTab] = useState(
+    ['detail', 'portfolio', 'skills', 'posts', 'schedule'].includes(initialTab) ? initialTab : 'detail'
+  )
+  const [saving, setSaving] = useState(false)
   const [experience, setExperience] = useState(MOCK_EXPERIENCE)
   const [gender, setGender] = useState('Male')
   const [schedule, setSchedule] = useState([
@@ -43,6 +64,23 @@ const EditProfile = () => {
 
   const labelClass = 'block text-xs font-semibold text-slate-600 mb-1.5'
 
+  // ? mapTeacherFormToMentorPayload converts form fields → backend firstname, description, …
+  const handleSave = async () => {
+    if (isApiEnabled() && mentorUserId) {
+      setSaving(true)
+      try {
+        await updateMentorProfile(mentorUserId, mapTeacherFormToMentorPayload({ ...form, gender }))
+      } catch (e) {
+        console.error(e)
+        alert(e.message || 'Save failed')
+        setSaving(false)
+        return
+      }
+      setSaving(false)
+    }
+    navigate(-1)
+  }
+
   const saveActions = (
     <div className="flex items-center gap-2">
       <button
@@ -54,9 +92,11 @@ const EditProfile = () => {
       </button>
       <button
         type="button"
-        className="px-4 py-2 rounded-xl bg-primary-400 text-white text-sm font-semibold hover:bg-primary-500 transition-colors"
+        onClick={handleSave}
+        disabled={saving}
+        className="px-4 py-2 rounded-xl bg-primary-400 text-white text-sm font-semibold hover:bg-primary-500 transition-colors disabled:opacity-60"
       >
-        Save Changes
+        {saving ? 'Saving…' : 'Save Changes'}
       </button>
     </div>
   )
@@ -72,6 +112,9 @@ const EditProfile = () => {
         <TabBar
           tabs={[
             { id: 'detail', label: 'DETAIL ABOUT YOU' },
+            { id: 'portfolio', label: 'PORTFOLIO' },
+            { id: 'skills', label: 'SKILLS' },
+            { id: 'posts', label: 'POSTS' },
             { id: 'schedule', label: 'SCHEDULE' },
           ]}
           active={tab}
@@ -235,6 +278,18 @@ const EditProfile = () => {
           <ExperienceSection experience={experience} onChange={setExperience} />
           </div>
         </div>
+      )}
+
+      {tab === 'portfolio' && mentorUserId && (
+        <MentorPortfolioSection userId={mentorUserId} />
+      )}
+
+      {tab === 'skills' && mentorUserId && (
+        <MentorSkillsSection userId={mentorUserId} />
+      )}
+
+      {tab === 'posts' && mentorUserId && (
+        <MentorPostsSection userId={mentorUserId} />
       )}
 
       {tab === 'schedule' && (

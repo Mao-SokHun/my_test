@@ -457,5 +457,8 @@ import { cn } from '@/lib/utils'
 | `docs/PROJECT_STRUCTURE.md` | This file — full project structure |
 | `docs/GUIDE_FUNCTION_FOLDER.md` | What each folder/file does |
 | `docs/CONNECT_API_GUIDE.md` | Step-by-step API connection guide |
+| `docs/MENTOR_SYSTEM_TASKS.md` | Backend mentor test checklist (your API work) |
+| `docs/MENTOR_BACKEND_CODE_GUIDE.md` | Sample mentor API code with line-by-line explanations |
+| `docs/NOTION_BACKEND_TASKS_BOARD.md` | Notion-style team task board (frontend reference UI) |
 | `team_workspace/README.md` | Task assignments & file placement |
 | `team_workspace/SETUP_GUIDE.md` | Paste & run guide for team members |

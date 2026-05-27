@@ -309,6 +309,7 @@ export default {
     content: 'Content',
     reports: 'Reports',
     roles: 'Roles',
+    backendTasks: 'Backend Tasks',
     helpCenter: 'Help Center',
     termsOfService: 'Terms of Service',
     privacyPolicy: 'Privacy Policy',

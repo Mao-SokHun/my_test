@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { isApiEnabled } from '@/constants/env'
 import { MapPin, Image, Smile, Link2, CheckCircle2, Users, ArrowLeft } from 'lucide-react'
 import {
   PageScaffold,
@@ -69,6 +70,17 @@ const TeacherCreatePost = () => {
             : t('createPost.writePostFor').replace('{{name}}', selectedCommunity?.name ?? '')
         }
       >
+        {isApiEnabled() && (
+          <PageCard className="mb-4 border-primary-100 bg-primary-50/40">
+            <p className="text-sm text-slate-700">
+              Mentor posts (Task #4) are managed in{' '}
+              <Link to="/teacher/edit-profile?tab=posts" className="text-primary-600 font-semibold hover:underline">
+                Edit Profile → POSTS
+              </Link>
+              . Community flow below is mock UI when API is connected.
+            </p>
+          </PageCard>
+        )}
         <div className="flex items-center gap-3 sm:gap-4 mb-2">
           <StepBadge n={1} label={t('createPost.community')} active={step === 1} done={step > 1} />
           <div className={clsx('h-px w-8 sm:w-12 flex-shrink-0', step > 1 ? 'bg-primary-300' : 'bg-slate-200')} />

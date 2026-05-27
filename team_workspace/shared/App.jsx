@@ -40,6 +40,7 @@ import TermsOfService from './pages/admin/TermsOfService'
 import PrivacyPolicy from './pages/admin/PrivacyPolicy'
 import ContactSupport from './pages/admin/ContactSupport'
 import Billing from './pages/admin/Billing'
+import BackendTasksTeam from './pages/admin/BackendTasksTeam'
 import LegalWrapper from './components/common/LegalWrapper'
 import {
   Landing,
@@ -270,6 +271,11 @@ const AppRoutes = () => (
     <Route path="/admin/billing" element={
       <ProtectedRoute role="admin">
         <AdminLayout><Billing /></AdminLayout>
+      </ProtectedRoute>
+    } />
+    <Route path="/admin/backend-tasks" element={
+      <ProtectedRoute role="admin">
+        <AdminLayout><BackendTasksTeam /></AdminLayout>
       </ProtectedRoute>
     } />
 

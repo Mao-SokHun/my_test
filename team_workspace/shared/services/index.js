@@ -1,6 +1,7 @@
 export { apiRequest, ApiError, isApiEnabled, getApiBaseUrl } from './api'
 export * from './authService'
 export * from './teacherService'
+export * from './mentorsApi'
 export * from './sessionService'
 export * from './communityService'
 export * from './notificationService'

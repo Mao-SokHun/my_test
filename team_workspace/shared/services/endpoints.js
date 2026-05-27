@@ -10,9 +10,24 @@ export const ENDPOINTS = {
     me: '/auth/me',
   },
 
+  /** @deprecated UI label "teacher" — backend uses mentors */
   teachers: {
-    list: '/teachers',
-    byId: (id) => `/teachers/${id}`,
+    list: '/mentors',
+    byId: (id) => `/mentors/${id}`,
+  },
+
+  // ? Mentor System (tasks #1–#6) — prefer mentorsApi.js for fetch calls
+  mentors: {
+    list: '/mentors',
+    search: '/mentors/search',
+    me: '/mentors/me',
+    byId: (id) => `/mentors/${id}`,
+    analytics: '/mentors/me/analytics',
+    portfolio: (id) => `/mentors/${id}/portfolio`,
+    skills: (id) => `/mentors/${id}/skills`,
+    skillCatalog: '/mentors/skills/catalog',
+    posts: (id) => `/mentors/${id}/posts`,
+    postById: (postId) => `/mentors/posts/${postId}`,
   },
 
   communities: {

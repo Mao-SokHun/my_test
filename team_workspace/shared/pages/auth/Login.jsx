@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { isApiEnabled } from '@/constants/env'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import Input from '../../components/ui/Input'
@@ -14,6 +15,10 @@ const Login = () => {
   const initialRole = searchParams.get('role') === 'teacher' ? 'teacher' : 'student'
   const [showPass, setShowPass] = useState(false)
   const [role, setRole] = useState(initialRole)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const selectRole = (r) => {
     setRole(r)
@@ -25,11 +30,21 @@ const Login = () => {
   const heroTitle = role === 'teacher' ? t('auth.loginHeroTeacherTitle') : t('auth.loginHeroStudentTitle')
   const heroSubtitle = role === 'teacher' ? t('auth.loginHeroTeacherSubtitle') : t('auth.loginHeroStudentSubtitle')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const user = login(role)
-    if (user.role === 'teacher') navigate('/teacher/home')
-    else navigate('/home')
+    setError('')
+    setSubmitting(true)
+    try {
+      const user = isApiEnabled()
+        ? await login({ email, password, role })
+        : await login(role)
+      if (user.role === 'teacher') navigate('/teacher/home')
+      else navigate('/home')
+    } catch (err) {
+      setError(err.message || 'Login failed')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -58,12 +73,24 @@ const Login = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input label={t('auth.emailOrPhone')} type="text" placeholder={t('auth.emailPlaceholder')} required />
+        {error && (
+          <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">{error}</p>
+        )}
+        <Input
+          label={t('auth.emailOrPhone')}
+          type="email"
+          placeholder={t('auth.emailPlaceholder')}
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
         <Input
           label={t('auth.password')}
           type={showPass ? 'text' : 'password'}
           placeholder="••••••••"
           required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           rightIcon={
             <button type="button" onClick={() => setShowPass(!showPass)} className="text-slate-400 hover:text-slate-600">
               {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -79,10 +106,16 @@ const Login = () => {
             {t('auth.forgotPassword')}
           </Link>
         </div>
-        <Button type="submit" variant="primary" className="w-full" size="lg">
-          {t('auth.loginButton')}
+        <Button type="submit" variant="primary" className="w-full" size="lg" disabled={submitting}>
+          {submitting ? '…' : t('auth.loginButton')}
         </Button>
       </form>
+
+      {!isApiEnabled() && (
+        <p className="text-xs text-slate-500 mt-3 text-center">
+          Demo: teacher@rokkru.com — any password (mock token for mentor API)
+        </p>
+      )}
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">

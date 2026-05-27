@@ -1,3 +1,4 @@
+// ? Task #6 — useMentorAnalytics → GET /mentors/me/analytics (counts from DB)
 import { useState } from 'react'
 import { FileText, Download, Eye, Users, BookOpen, TrendingUp, Calendar } from 'lucide-react'
 import clsx from 'clsx'
@@ -9,6 +10,8 @@ import {
   PageAmbient,
 } from '@/components'
 import { useTranslation } from '@/i18n'
+import { useMentorAnalytics } from '@/hooks/useMentorAnalytics'
+import { isApiEnabled } from '@/constants/env'
 
 const WEEK_DAYS = [
   { label: 'Jan 22', key: 'd22' },
@@ -48,6 +51,7 @@ const scheduleData = Object.fromEntries(
 
 const Analytics = () => {
   const { t } = useTranslation()
+  const { data: apiStats, loading: apiLoading } = useMentorAnalytics()
 
   const SUBJECTS_OPTS = [t('analytics.allSubjects'), 'Math', 'Physics', 'Data Science', 'Statistics']
   const STATUS_OPTS = [t('analytics.allStatus'), 'Active', 'Pending', 'Cancelled']
@@ -95,10 +99,31 @@ const Analytics = () => {
         }
     >
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatMetric label={t('analytics.totalPosts')} value="1,248" icon={BookOpen} tone="primary" change={`+8% ${t('analytics.thisMonth')}`} />
-        <StatMetric label={t('analytics.totalViewer')} value="18,420" icon={Eye} tone="info" change={`+14% ${t('analytics.thisMonth')}`} />
-        <StatMetric label={t('analytics.totalSessions')} value="42,891" icon={Users} tone="success" />
-        <StatMetric label={t('analytics.avgPerWeek')} value="8.8" icon={TrendingUp} tone="warning" />
+        <StatMetric
+          label={t('analytics.totalPosts')}
+          value={isApiEnabled() && apiStats ? String(apiStats.posts_count ?? 0) : '1,248'}
+          icon={BookOpen}
+          tone="primary"
+          change={apiLoading ? '…' : `+8% ${t('analytics.thisMonth')}`}
+        />
+        <StatMetric
+          label={t('analytics.totalViewer')}
+          value={isApiEnabled() && apiStats ? String(apiStats.profile_views ?? 0) : '18,420'}
+          icon={Eye}
+          tone="info"
+        />
+        <StatMetric
+          label={t('analytics.totalSessions')}
+          value={isApiEnabled() && apiStats ? String(apiStats.skills_count ?? 0) : '42,891'}
+          icon={Users}
+          tone="success"
+        />
+        <StatMetric
+          label={t('analytics.avgPerWeek')}
+          value={isApiEnabled() && apiStats ? String(apiStats.portfolio_count ?? 0) : '8.8'}
+          icon={TrendingUp}
+          tone="warning"
+        />
       </div>
 
       <FilterBar

@@ -1,22 +1,22 @@
 import { useState } from 'react'
-import { Star, Users, Clock, Edit2, Check, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Star, Users, Clock, Edit2, Check, X, ExternalLink } from 'lucide-react'
 import Avatar from '../../components/ui/Avatar'
 import { PageCard, PageScaffold, ExperienceSection, ScheduleSection, PageAmbient } from '@/components'
+import { useAuth } from '@/hooks'
+import { useTeacherProfile } from '@/hooks/useTeacherProfile'
+import { useMentorPortfolio } from '@/hooks/useMentorPortfolio'
+import { useMentorSkills } from '@/hooks/useMentorSkills'
+import { isApiEnabled } from '@/constants/env'
 
-const MOCK_BIO = `A dedicated Physics educator with a passion for simplifying complex quantum mechanics and thermodynamics for high school students. Over the past 8 years, I have developed a unique teaching methodology that blends theoretical physics with hands-on experiments to guide students to better understand how the world works.
-
-Formerly at Lead Researcher, Volunteer at Global Field Corp. I have also practiced in the how to manually type equations for all students who are intrinsic, analytical, and highly committed to your specific career goal.`
+const MOCK_BIO = `A dedicated Physics educator with a passion for simplifying complex topics for high school students.`
 
 const MOCK_SCHEDULE = [
   { id: 1, day: 'Monday', time: '8:00 – 8:45 AM', subject: 'Physics G11' },
-  { id: 2, day: 'Monday', time: '10:00 – 10:45 AM', subject: 'Math G12' },
-  { id: 3, day: 'Wednesday', time: '8:00 – 8:45 AM', subject: 'Physics G12' },
-  { id: 4, day: 'Friday', time: '2:00 – 2:45 PM', subject: 'Lab Session' },
 ]
 
 const MOCK_EXPERIENCE = [
-  { id: 1, role: 'Senior Physics Teacher', org: 'Global Science Academy, Phnom Penh', period: '2018–23' },
-  { id: 2, role: 'Research Associate', org: 'Institute of Technology Solvation', period: '2015–18' },
+  { id: 1, role: 'Senior Physics Teacher', org: 'Global Science Academy', period: '2018–23' },
 ]
 
 const SectionCard = ({ title, children, onEdit, onConfirm, onCancel, editing }) => (
@@ -58,11 +58,20 @@ const SectionCard = ({ title, children, onEdit, onConfirm, onCancel, editing }) 
 )
 
 const TeacherMyProfile = () => {
+  const { user } = useAuth()
+  const userId = user?.user_id ?? user?.id
+  const { profile, loading } = useTeacherProfile(null, { currentUser: true })
+  const { items: portfolio } = useMentorPortfolio(userId)
+  const { skills } = useMentorSkills(userId)
+
   const [bioEditing, setBioEditing] = useState(false)
   const [bioText, setBioText] = useState(MOCK_BIO)
   const [bioTemp, setBioTemp] = useState(MOCK_BIO)
   const [schedule, setSchedule] = useState(MOCK_SCHEDULE)
   const [experience, setExperience] = useState(MOCK_EXPERIENCE)
+
+  const displayName = profile?.name || user?.name || 'Teacher'
+  const displayBio = profile?.bio || (isApiEnabled() ? '' : MOCK_BIO)
 
   const confirmBio = () => {
     setBioText(bioTemp)
@@ -74,67 +83,123 @@ const TeacherMyProfile = () => {
       <PageScaffold
         title="My Profile"
         subtitle="Public view — how students see your teaching profile"
-      >
-        <div className="flex flex-col sm:flex-row items-start gap-5">
-          <Avatar name="Phe Sophy" size="xl" />
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-slate-800">Phe Sophy</h1>
-            <p className="text-sm text-slate-500 mt-0.5">Physics Specialist of Data Science &amp; AI</p>
-            <div className="flex items-center gap-1.5 mt-2">
-              {[1, 2, 3, 4].map((i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-              ))}
-              <Star className="w-4 h-4 text-slate-200" />
-              <span className="text-xs text-slate-400 ml-1">4.5 · 128 reviews</span>
-            </div>
-            <div className="flex items-center gap-5 mt-3 text-xs text-slate-500 flex-wrap">
-              <span className="flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-primary-500" />
-                Group Session: <strong className="text-slate-800 ml-0.5">24 Students</strong>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-primary-500" />
-                <strong className="text-slate-800">31 hrs</strong> taught
-              </span>
-              <span className="text-slate-800 font-semibold">$45/hr</span>
-            </div>
-          </div>
-        </div>
-
-      <div className="grid lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2 space-y-5">
-          <SectionCard
-            title="Detail About Me"
-            editing={bioEditing}
-            onEdit={() => {
-              setBioTemp(bioText)
-              setBioEditing(true)
-            }}
-            onConfirm={confirmBio}
-            onCancel={() => {
-              setBioTemp(bioText)
-              setBioEditing(false)
-            }}
+        action={
+          <Link
+            to="/teacher/edit-profile"
+            className="px-4 py-2 rounded-xl bg-primary-400 text-white text-sm font-semibold hover:bg-primary-500"
           >
-            {bioEditing ? (
-              <textarea
-                value={bioTemp}
-                onChange={(e) => setBioTemp(e.target.value)}
-                rows={7}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-700 resize-none focus:outline-none focus:ring-2 focus:ring-primary-200"
-              />
-            ) : (
-              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">{bioText}</p>
-            )}
-          </SectionCard>
+            Edit profile
+          </Link>
+        }
+      >
+        {loading && isApiEnabled() ? (
+          <p className="text-sm text-slate-500">Loading profile…</p>
+        ) : (
+          <>
+            <div className="flex flex-col sm:flex-row items-start gap-5">
+              <Avatar name={displayName} size="xl" />
+              <div className="flex-1">
+                <h1 className="text-xl font-bold text-slate-800">{displayName}</h1>
+                <p className="text-sm text-slate-500 mt-0.5">
+                  {profile?.subjects?.join(' · ') || 'Mentor'}
+                  {profile?.experience ? ` · ${profile.experience}+ yrs` : ''}
+                </p>
+                <div className="flex items-center gap-1.5 mt-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                  <Star className="w-4 h-4 text-slate-200" />
+                  <span className="text-xs text-slate-400 ml-1">
+                    {profile?.rating ?? 4.5} · {profile?.reviewCount ?? 0} reviews
+                  </span>
+                </div>
+                <div className="flex items-center gap-5 mt-3 text-xs text-slate-500 flex-wrap">
+                  {profile?.location && (
+                    <span className="text-slate-600">{profile.location}</span>
+                  )}
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-primary-500" />
+                    <strong className="text-slate-800">{profile?.experience ?? 0} yrs</strong> experience
+                  </span>
+                </div>
+              </div>
+            </div>
 
-          <ExperienceSection experience={experience} onChange={setExperience} />
-        </div>
+            <div className="grid lg:grid-cols-3 gap-5 mt-6">
+              <div className="lg:col-span-2 space-y-5">
+                <SectionCard
+                  title="Detail About Me"
+                  editing={bioEditing}
+                  onEdit={() => {
+                    setBioTemp(displayBio || bioText)
+                    setBioEditing(true)
+                  }}
+                  onConfirm={confirmBio}
+                  onCancel={() => {
+                    setBioTemp(bioText)
+                    setBioEditing(false)
+                  }}
+                >
+                  {bioEditing ? (
+                    <textarea
+                      value={bioTemp}
+                      onChange={(e) => setBioTemp(e.target.value)}
+                      rows={7}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-700 resize-none focus:outline-none focus:ring-2 focus:ring-primary-200"
+                    />
+                  ) : (
+                    <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                      {displayBio || bioText || 'Add your bio in Edit Profile.'}
+                    </p>
+                  )}
+                </SectionCard>
 
-        <div>
-          <ScheduleSection schedule={schedule} onChange={setSchedule} />
-        </div>
-      </div>
+                {isApiEnabled() && skills.length > 0 && (
+                  <PageCard>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Skills</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {skills.map((ms) => (
+                        <span
+                          key={ms.ms_id}
+                          className="px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-medium capitalize"
+                        >
+                          {ms.SubSkill?.skill_name || 'Skill'} · {ms.proficiency_level}
+                        </span>
+                      ))}
+                    </div>
+                  </PageCard>
+                )}
+
+                {isApiEnabled() && portfolio.length > 0 && (
+                  <PageCard>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Portfolio</h3>
+                    <ul className="space-y-2">
+                      {portfolio.map((item) => (
+                        <li key={item.link}>
+                          <a
+                            href={item.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-sm text-primary-600 hover:underline inline-flex items-center gap-1"
+                          >
+                            {item.link_tag}: {item.link}
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </PageCard>
+                )}
+
+                <ExperienceSection experience={experience} onChange={setExperience} />
+              </div>
+
+              <div>
+                <ScheduleSection schedule={schedule} onChange={setSchedule} />
+              </div>
+            </div>
+          </>
+        )}
       </PageScaffold>
     </PageAmbient>
   )

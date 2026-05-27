@@ -217,6 +217,7 @@ export default {
     content: "មាតិកា",
     reports: "របាយការណ៍",
     roles: "តួនាទី",
+    backendTasks: "កិច្ចការ Backend",
     helpCenter: "មជ្ឈមណ្ឌលជំនួយ",
     termsOfService: "លក្ខខណ្ឌប្រើប្រាស់",
     privacyPolicy: "គោលការណ៍ភាពឯកជន",

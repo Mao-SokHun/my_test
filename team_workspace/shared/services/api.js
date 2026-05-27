@@ -1,3 +1,8 @@
+// ================ Start API client ================
+// ? Shared by mentorsApi.js — all mentor calls go through apiRequest
+// ? Enable backend: VITE_API_URL=http://localhost:3000/api/v1
+
+// ? true when .env has VITE_API_URL — teacherService uses real API vs mock
 function isApiEnabled() {
   const url = import.meta.env.VITE_API_URL
   return typeof url === 'string' && url.trim().length > 0
@@ -28,6 +33,7 @@ async function apiRequest(path, init = {}) {
       : {}),
   }
 
+  // ? Task #10 — must match backend auth.js: Authorization: Bearer <jwt>
   const token = typeof window !== 'undefined' ? localStorage.getItem('rokkru_token') : null
   if (token) headers.Authorization = `Bearer ${token}`
 
@@ -38,7 +44,7 @@ async function apiRequest(path, init = {}) {
     let message = res.statusText
     try {
       body = await res.json()
-      message = body.message ?? body.error ?? message
+      message = body.message ?? body.error ?? message // ? backend fail() uses "error"
     } catch { /* ignore */ }
     throw new ApiError(message, res.status, body)
   }
@@ -48,3 +54,4 @@ async function apiRequest(path, init = {}) {
 }
 
 export { isApiEnabled, getApiBaseUrl, apiRequest, ApiError }
+// ================ End API client ================
