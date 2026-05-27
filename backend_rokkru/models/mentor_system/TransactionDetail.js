@@ -1,3 +1,7 @@
+// ============= Start TransactionDetail model =============
+// Stores payment transaction metadata for subscriptions.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -45,3 +49,5 @@ const TransactionDetail = sequelize.define('TransactionDetail', {
 });
 
 module.exports = TransactionDetail;
+
+// ============= End TransactionDetail model =============

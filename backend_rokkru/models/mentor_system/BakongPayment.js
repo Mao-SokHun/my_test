@@ -1,3 +1,7 @@
+// ============= Start BakongPayment model =============
+// Stores Bakong payment records for user transactions.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -38,3 +42,5 @@ const BakongPayment = sequelize.define('BakongPayment', {
 });
 
 module.exports = BakongPayment;
+
+// ============= End BakongPayment model =============

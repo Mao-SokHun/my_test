@@ -1,3 +1,7 @@
+// ============= Start AccountHistoryLog model =============
+// Keeps audit trail for account actions (device, action, status, IP).
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -29,3 +33,5 @@ const AccountHistoryLog = sequelize.define('AccountHistoryLog', {
 });
 
 module.exports = AccountHistoryLog;
+
+// ============= End AccountHistoryLog model =============

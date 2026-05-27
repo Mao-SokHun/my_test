@@ -1,3 +1,7 @@
+// ============= Start UserType model =============
+// Master table for account roles (student, mentor, admin, ...).
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -24,3 +28,5 @@ const UserType = sequelize.define('UserType', {
 });
 
 module.exports = UserType;
+
+// ============= End UserType model =============

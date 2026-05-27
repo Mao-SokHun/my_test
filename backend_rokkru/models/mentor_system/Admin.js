@@ -1,3 +1,7 @@
+// ============= Start Admin model =============
+// Represents admin profile linked to users table by user_id.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -27,3 +31,5 @@ const Admin = sequelize.define('Admin', {
 });
 
 module.exports = Admin;
+
+// ============= End Admin model =============

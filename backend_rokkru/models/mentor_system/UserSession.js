@@ -1,3 +1,7 @@
+// ============= Start UserSession model =============
+// Tracks refresh-token sessions and device/login state.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -42,3 +46,5 @@ const UserSession = sequelize.define('UserSession', {
 });
 
 module.exports = UserSession;
+
+// ============= End UserSession model =============

@@ -1,3 +1,7 @@
+// ============= Start CommunityHistory model =============
+// Keeps edit/history snapshots of community posts.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -40,3 +44,5 @@ const CommunityHistory = sequelize.define('CommunityHistory', {
 });
 
 module.exports = CommunityHistory;
+
+// ============= End CommunityHistory model =============

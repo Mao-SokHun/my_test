@@ -1,3 +1,7 @@
+// ============= Start Student model =============
+// Student profile details linked to users table.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -41,3 +45,5 @@ const Student = sequelize.define('Student', {
 });
 
 module.exports = Student;
+
+// ============= End Student model =============

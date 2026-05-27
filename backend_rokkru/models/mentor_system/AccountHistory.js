@@ -1,3 +1,7 @@
+// ============= Start AccountHistory model =============
+// Stores previous account credentials when account info changes.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -31,3 +35,5 @@ const AccountHistory = sequelize.define('AccountHistory', {
 });
 
 module.exports = AccountHistory;
+
+// ============= End AccountHistory model =============

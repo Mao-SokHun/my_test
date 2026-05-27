@@ -1,3 +1,7 @@
+// ============= Start Subscription model =============
+// Maps user subscriptions to selected subscription plans.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -31,3 +35,5 @@ const Subscription = sequelize.define('Subscription', {
 });
 
 module.exports = Subscription;
+
+// ============= End Subscription model =============

@@ -1,3 +1,7 @@
+// ============= Start User model =============
+// Core auth/account table for all user types.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -36,3 +40,5 @@ const User = sequelize.define('User', {
 });
 
 module.exports = User;
+
+// ============= End User model =============

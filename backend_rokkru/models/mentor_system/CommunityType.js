@@ -1,3 +1,7 @@
+// ============= Start CommunityType model =============
+// Lookup table for community post categories/types.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -24,3 +28,5 @@ const CommunityType = sequelize.define('CommunityType', {
 });
 
 module.exports = CommunityType;
+
+// ============= End CommunityType model =============

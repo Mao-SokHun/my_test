@@ -1,3 +1,7 @@
+// ============= Start SubscriptionPlan model =============
+// Defines subscription plan packages created by admin.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -31,3 +35,5 @@ const SubscriptionPlan = sequelize.define('SubscriptionPlan', {
 });
 
 module.exports = SubscriptionPlan;
+
+// ============= End SubscriptionPlan model =============

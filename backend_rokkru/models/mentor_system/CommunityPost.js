@@ -1,3 +1,7 @@
+// ============= Start CommunityPost model =============
+// Represents posts created in the community module.
+// ................................................
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/config');
 
@@ -39,3 +43,5 @@ const CommunityPost = sequelize.define('CommunityPost', {
 });
 
 module.exports = CommunityPost;
+
+// ============= End CommunityPost model =============
