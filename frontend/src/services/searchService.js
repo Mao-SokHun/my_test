@@ -5,9 +5,7 @@ const ENDPOINTS = {
 }
 
 export async function search(query, params = {}) {
-  if (isApiEnabled()) {
-    const qs = new URLSearchParams({ q: query, ...params })
-    return apiRequest(`${ENDPOINTS.search}?${qs.toString()}`)
-  }
-  return { results: [], total: 0 }
+  if (!isApiEnabled()) throw new Error('Backend API is required for search.')
+  const qs = new URLSearchParams({ q: query, ...params })
+  return apiRequest(`${ENDPOINTS.search}?${qs.toString()}`)
 }

@@ -16,7 +16,9 @@ import { useAuth } from '@/hooks'
  *   - Correct role                     → render children
  */
 const ProtectedRoute = ({ role, children }) => {
-  const { user } = useAuth()
+  const { user, authLoading } = useAuth()
+
+  if (authLoading) return null
 
   if (!user) {
     return <Navigate to={role === 'admin' ? '/admin/login' : '/login'} replace />

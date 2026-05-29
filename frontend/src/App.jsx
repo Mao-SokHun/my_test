@@ -8,6 +8,8 @@ import ProtectedRoute from './components/layout/ProtectedRoute'
 import Login from './pages/auth/Login'
 import AdminLogin from './pages/auth/AdminLogin'
 import CreateAccount from './pages/auth/CreateAccount'
+import ForgotPasswordOtp from './pages/auth/ForgotPasswordOtp'
+import VerifyOtp from './pages/auth/VerifyOtp'
 import CompleteProfile from './pages/onboarding/CompleteProfile'
 import ChooseCommunity from './pages/onboarding/ChooseCommunity'
 import TeacherSubscription from './pages/teacher/TeacherSubscription'
@@ -81,7 +83,8 @@ const AdminOrPublicContact = ({ AdminPage }) => {
 
 /** Root: redirect logged-in users to their home page, guests see Landing */
 const RootRedirect = () => {
-  const { user } = useAuth()
+  const { user, authLoading } = useAuth()
+  if (authLoading) return null
   if (!user) return <Landing />
   if (user.role === 'teacher') return <Navigate to="/teacher/home" replace />
   if (user.role === 'admin')   return <Navigate to="/admin" replace />
@@ -97,6 +100,8 @@ const AppRoutes = () => (
     <Route path="/login"          element={<Login />} />
     <Route path="/admin/login"    element={<AdminLogin />} />
     <Route path="/create-account" element={<CreateAccount />} />
+    <Route path="/forgot-password" element={<ForgotPasswordOtp />} />
+    <Route path="/forgot-password/verify-otp" element={<VerifyOtp />} />
     <Route path="/teacher/landing" element={<Navigate to="/create-account?role=teacher" replace />} />
     <Route path="/teacher/subscription" element={
       <ProtectedRoute role="teacher">

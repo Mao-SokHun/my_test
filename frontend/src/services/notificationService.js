@@ -7,23 +7,17 @@ const ENDPOINTS = {
 }
 
 export async function fetchNotifications() {
-  if (isApiEnabled()) {
-    const json = await apiRequest(ENDPOINTS.list)
-    return Array.isArray(json) ? json : (json.data ?? [])
-  }
-  return []
+  if (!isApiEnabled()) throw new Error('Backend API is required to fetch notifications.')
+  const json = await apiRequest(ENDPOINTS.list)
+  return Array.isArray(json) ? json : (json.data ?? [])
 }
 
 export async function markNotificationRead(id) {
-  if (isApiEnabled()) {
-    return apiRequest(ENDPOINTS.markRead(id), { method: 'PUT' })
-  }
-  return { id, read: true }
+  if (!isApiEnabled()) throw new Error('Backend API is required to update notification status.')
+  return apiRequest(ENDPOINTS.markRead(id), { method: 'PUT' })
 }
 
 export async function markAllNotificationsRead() {
-  if (isApiEnabled()) {
-    return apiRequest('/notifications/read-all', { method: 'PUT' })
-  }
-  return { success: true }
+  if (!isApiEnabled()) throw new Error('Backend API is required to update notification status.')
+  return apiRequest('/notifications/read-all', { method: 'PUT' })
 }

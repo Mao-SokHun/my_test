@@ -104,18 +104,18 @@ export const locationOptions = [
   'Tbong Khmum',
 ]
 
-export const sortOptions = [
-  'Best Match',
-  'Highest Rated',
-  'Most Popular',
-  'Newest',
-  'Most Reviewed',
-  'Price: Low to High',
-  'Price: High to Low',
-  'Nearest Location',
-  'Most Students',
-  'Top Recommended',
-]
+// export const sortOptions = [
+//   'Best Match',
+//   'Highest Rated',
+//   'Most Popular',
+//   'Newest',
+//   'Most Reviewed',
+//   'Price: Low to High',
+//   'Price: High to Low',
+//   'Nearest Location',
+//   'Most Students',
+//   'Top Recommended',
+// ]
 
 export const sessionTypeOptions = [
   FILTER_ALL.type,
@@ -140,7 +140,7 @@ export const DEFAULT_FILTER_OPTION_SET = {
   majors: majorOptions,
   subjects: subjectOptions,
   locations: locationOptions,
-  sorts: sortOptions,
+  // sorts: sortOptions,
   types: sessionTypeOptions,
   times: sessionTimeOptions,
 }

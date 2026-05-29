@@ -1,12 +1,11 @@
 // ================ Start useTeacherProfile ================
 // ? Teacher detail page — GET /mentors/:userId → mapMentorToTeacher
-// ? Without VITE_API_URL uses mockTeachers
+// ? Requires backend API (no mock fallback in runtime)
 
 import { useState, useEffect } from 'react'
 import { isApiEnabled } from '@/constants/env'
 import { fetchMentorById } from '@/services/mentorsApi'
 import { mapMentorToTeacher } from '@/utils/mentorMapper'
-import { teachers as mockTeachers } from '@/constants/mockData'
 
 export const useTeacherProfile = (teacherId) => {
   const [profile, setProfile] = useState(null)
@@ -17,7 +16,8 @@ export const useTeacherProfile = (teacherId) => {
     if (!teacherId) return
 
     if (!isApiEnabled()) {
-      setProfile(mockTeachers.find((t) => String(t.id) === String(teacherId)) ?? null)
+      setError(new Error('Backend API is required to fetch teacher profile.'))
+      setProfile(null)
       return
     }
 

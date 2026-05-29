@@ -10,43 +10,38 @@ const ENDPOINTS = {
 }
 
 export async function fetchCurrentSubscription() {
-  if (isApiEnabled()) {
-    return apiRequest(ENDPOINTS.current)
-  }
-  return null
+  if (!isApiEnabled()) throw new Error('Backend API is required for subscription data.')
+  return apiRequest(ENDPOINTS.current)
 }
 
 export async function fetchPlans() {
-  if (isApiEnabled()) {
-    const json = await apiRequest(ENDPOINTS.plans)
-    return Array.isArray(json) ? json : (json.data ?? [])
-  }
-  return [
-    { id: 'free', name: 'Free', price: 0 },
-    { id: 'premium', name: 'Premium', price: 29 },
-  ]
+  if (!isApiEnabled()) throw new Error('Backend API is required for subscription plans.')
+  const json = await apiRequest(ENDPOINTS.plans)
+  return Array.isArray(json) ? json : (json.data ?? [])
 }
 
 export async function subscribe(planData) {
-  if (isApiEnabled()) {
-    return apiRequest(ENDPOINTS.subscribe, {
-      method: 'POST',
-      body: JSON.stringify(planData),
-    })
-  }
-  return { plan: planData.plan, status: 'active' }
+  if (!isApiEnabled()) throw new Error('Backend API is required for subscription actions.')
+  return apiRequest(ENDPOINTS.subscribe, {
+    method: 'POST',
+    body: JSON.stringify(planData),
+  })
 }
 
 export async function cancelSubscription() {
-  if (isApiEnabled()) {
-    return apiRequest(ENDPOINTS.cancel, { method: 'POST' })
-  }
-  return { status: 'canceling' }
+  if (!isApiEnabled()) throw new Error('Backend API is required for subscription actions.')
+  return apiRequest(ENDPOINTS.cancel, { method: 'POST' })
 }
 
 export async function resumeSubscription() {
-  if (isApiEnabled()) {
-    return apiRequest(ENDPOINTS.resume, { method: 'POST' })
-  }
-  return { status: 'active' }
+  if (!isApiEnabled()) throw new Error('Backend API is required for subscription actions.')
+  return apiRequest(ENDPOINTS.resume, { method: 'POST' })
+}
+
+export async function changeSubscriptionPlan(planData) {
+  if (!isApiEnabled()) throw new Error('Backend API is required for subscription actions.')
+  return apiRequest(ENDPOINTS.changePlan, {
+    method: 'POST',
+    body: JSON.stringify(planData),
+  })
 }

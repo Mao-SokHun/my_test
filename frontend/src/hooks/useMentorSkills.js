@@ -19,7 +19,12 @@ export function useMentorSkills(userId) {
   const [error, setError] = useState(null)
 
   const load = useCallback(async () => {
-    if (!isApiEnabled()) return
+    if (!isApiEnabled()) {
+      setError('Backend API is required to load skills.')
+      setSkills([])
+      setCatalog([])
+      return
+    }
     setLoading(true)
     setError(null)
     try {

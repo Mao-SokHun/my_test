@@ -102,7 +102,7 @@ const Login = () => {
             <input type="checkbox" className="rounded border-slate-300 text-primary-500" />
             {t('auth.rememberMe')}
           </label>
-          <Link to="/login" className="text-primary-600 font-medium hover:underline">
+          <Link to="/forgot-password" className="text-primary-600 font-medium hover:underline">
             {t('auth.forgotPassword')}
           </Link>
         </div>
@@ -110,12 +110,6 @@ const Login = () => {
           {submitting ? '…' : t('auth.loginButton')}
         </Button>
       </form>
-
-      {!isApiEnabled() && (
-        <p className="text-xs text-slate-500 mt-3 text-center">
-          Demo: teacher@rokkru.com — any password (mock token for mentor API)
-        </p>
-      )}
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { fetchTeachers } from '@/services/teacherService'
 
 /**
- * Fetches teacher list from API (or mock fallback).
+ * Fetches teacher list from backend API.
  * Backend team: this calls GET /teachers with query params from filters.
  * Expected response: { data: Teacher[], total: number, page?, pageSize? }
  */

@@ -5,9 +5,7 @@
 import { isApiEnabled } from './api'
 import { searchMentors, fetchMentorById } from './mentorsApi'
 import { mapMentorToTeacher } from '@/utils/mentorMapper'
-import { filterTeachers } from '@/utils/filterTeachers'
 import { toTeacherQueryParams } from '@/utils/teacherQuery'
-import { teachers as mockTeachers } from '@/constants/mockData'
 
 // ? UI pageSize → backend limit; UI sort labels → backend sort values
 function mapListParams(filters = {}) {
@@ -23,37 +21,22 @@ function mapListParams(filters = {}) {
 
 // ? GET /mentors/search — returns { items, total, page, pageSize }
 export async function fetchTeachers(filters = {}) {
-  if (isApiEnabled()) {
-    const data = await searchMentors(mapListParams(filters))
-    const items = (data?.items ?? []).map(mapMentorToTeacher)
-    return {
-      items,
-      total: data?.total ?? items.length,
-      page: data?.page,
-      pageSize: data?.limit,
-    }
-  }
-
-  // ? No VITE_API_URL — use mock data from constants/mockData
-  const items = filterTeachers(mockTeachers, filters)
-  const page = filters.page ?? 1
-  const pageSize = filters.pageSize ?? items.length
-  const start = (page - 1) * pageSize
+  if (!isApiEnabled()) throw new Error('Backend API is required to fetch teachers.')
+  const data = await searchMentors(mapListParams(filters))
+  const items = (data?.items ?? []).map(mapMentorToTeacher)
   return {
-    items: items.slice(start, start + pageSize),
-    total: items.length,
-    page,
-    pageSize,
+    items,
+    total: data?.total ?? items.length,
+    page: data?.page,
+    pageSize: data?.limit,
   }
 }
 
 // ? GET /mentors/:id — one teacher card / profile page
 export async function fetchTeacherById(id) {
-  if (isApiEnabled()) {
-    const mentor = await fetchMentorById(id)
-    return mapMentorToTeacher(mentor)
-  }
-  return mockTeachers.find((t) => String(t.id) === String(id)) ?? null
+  if (!isApiEnabled()) throw new Error('Backend API is required to fetch teacher details.')
+  const mentor = await fetchMentorById(id)
+  return mapMentorToTeacher(mentor)
 }
 
 // ================ End teacher service ================

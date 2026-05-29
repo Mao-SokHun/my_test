@@ -7,6 +7,7 @@ import AuthRoleTabs from '../../components/common/AuthRoleTabs'
 import AuthLayout from '@/components/layout/AuthLayout'
 import clsx from 'clsx'
 import { useTranslation } from '@/i18n'
+import { register } from '@/services/authService'
 
 const CreateAccount = () => {
   const { t } = useTranslation()
@@ -20,6 +21,12 @@ const CreateAccount = () => {
   }
   const [showPass, setShowPass] = useState(false)
   const [agreed, setAgreed] = useState(false)
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const navigate = useNavigate()
 
   const heroTitle =
@@ -27,10 +34,26 @@ const CreateAccount = () => {
   const heroSubtitle =
     role === 'teacher' ? t('auth.signupHeroTeacherSubtitle') : t('auth.signupHeroStudentSubtitle')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (role === 'student') navigate('/onboarding/complete-profile')
-    else navigate('/teacher/home')
+    setError('')
+    setSubmitting(true)
+    try {
+      const user = await register({
+        role,
+        firstName,
+        lastName,
+        email,
+        password,
+        user_type_id: role === 'teacher' ? 2 : 1,
+      })
+      if (user.role === 'teacher') navigate('/teacher/home')
+      else navigate('/onboarding/complete-profile')
+    } catch (err) {
+      setError(err.message || 'Create account failed')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -56,16 +79,21 @@ const CreateAccount = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">{error}</p>
+        )}
         <div className="grid grid-cols-2 gap-3">
-          <Input label={t('auth.firstName')} placeholder="Alex" required />
-          <Input label={t('auth.lastName')} placeholder="Johnson" required />
+          <Input label={t('auth.firstName')} placeholder="Alex" required value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+          <Input label={t('auth.lastName')} placeholder="Johnson" required value={lastName} onChange={(e) => setLastName(e.target.value)} />
         </div>
-        <Input label={t('auth.emailAddress')} type="email" placeholder={t('auth.emailPlaceholder')} required />
+        <Input label={t('auth.emailAddress')} type="email" placeholder={t('auth.emailPlaceholder')} required value={email} onChange={(e) => setEmail(e.target.value)} />
         <Input
           label={t('auth.password')}
           type={showPass ? 'text' : 'password'}
           placeholder={t('auth.passwordMinPlaceholder')}
           required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           rightIcon={
             <button
               type="button"
@@ -100,8 +128,8 @@ const CreateAccount = () => {
           </span>
         </label>
 
-        <Button type="submit" variant="primary" size="lg" className="w-full" disabled={!agreed}>
-          {role === 'teacher' ? t('auth.createTeacherAccount') : t('auth.createAccount')}
+        <Button type="submit" variant="primary" size="lg" className="w-full" disabled={!agreed || submitting}>
+          {submitting ? '…' : (role === 'teacher' ? t('auth.createTeacherAccount') : t('auth.createAccount'))}
         </Button>
       </form>
 

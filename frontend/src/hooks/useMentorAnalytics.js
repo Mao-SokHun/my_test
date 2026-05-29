@@ -7,14 +7,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { isApiEnabled } from '@/constants/env'
 import { fetchMyAnalytics } from '@/services/mentorsApi'
 
-const MOCK_ANALYTICS = {
-  profile_views: 0,
-  portfolio_count: 0,
-  skills_count: 0,
-  posts_count: 0,
-  published_posts_count: 0,
-}
-
 export function useMentorAnalytics() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -24,14 +16,11 @@ export function useMentorAnalytics() {
     setLoading(true)
     setError(null)
     try {
-      if (isApiEnabled()) {
-        setData(await fetchMyAnalytics())
-      } else {
-        setData(MOCK_ANALYTICS)
-      }
+      if (!isApiEnabled()) throw new Error('Backend API is required to load analytics.')
+      setData(await fetchMyAnalytics())
     } catch (loadError) {
       setError(loadError.message || 'Failed to load analytics')
-      setData(MOCK_ANALYTICS)
+      setData(null)
     } finally {
       setLoading(false)
     }

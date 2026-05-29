@@ -8,6 +8,9 @@ export const ENDPOINTS = {
     register: '/auth/register',
     logout: '/auth/logout',
     me: '/auth/me',
+    forgotPasswordRequestOtp: '/auth/forgot-password/request-otp',
+    forgotPasswordVerifyOtp: '/auth/forgot-password/verify-otp',
+    forgotPasswordReset: '/auth/forgot-password/reset',
   },
 
   /** @deprecated UI label "teacher" — backend uses mentors */

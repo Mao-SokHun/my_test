@@ -1,54 +1,44 @@
 // ================ Start AuthContext ================
 // ? login() → authService → rokkru_token for mentor API
 
-import { createContext, useContext, useState, useCallback } from 'react'
-import { isApiEnabled } from '@/constants/env'
-import { login as apiLogin, logout as apiLogout } from '@/services/authService'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { login as apiLogin, logout as apiLogout, fetchCurrentUser } from '@/services/authService'
 
 const AuthContext = createContext(null)
 
-const MOCK_USERS = {
-  student: { id: '1', user_id: 1, name: 'Alex Johnson', email: 'student@rokkru.com', role: 'student', avatar: null },
-  teacher: { id: '2', user_id: 2, name: 'Dr. Phe Sophy', email: 'teacher@rokkru.com', role: 'teacher', avatar: null },
-  admin: { id: '3', user_id: 3, name: 'Super Admin', email: 'admin@rokkru.com', role: 'admin', avatar: null },
-}
-
-export const getStoredUser = () => {
-  try {
-    const raw = localStorage.getItem('rokkru_user')
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
-}
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => getStoredUser())
+  const [user, setUser] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const bootstrap = async () => {
+      try {
+        const token = localStorage.getItem('rokkru_token')
+        if (!token) return
+        const currentUser = await fetchCurrentUser()
+        if (!cancelled) setUser(currentUser)
+      } catch {
+        localStorage.removeItem('rokkru_token')
+        localStorage.removeItem('rokkru_user')
+        if (!cancelled) setUser(null)
+      } finally {
+        if (!cancelled) setAuthLoading(false)
+      }
+    }
+
+    bootstrap()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const login = useCallback(async (credentialsOrRole) => {
-    if (typeof credentialsOrRole === 'string') {
-      const role = credentialsOrRole
-      if (isApiEnabled()) {
-        throw new Error('Use email and password when API is enabled')
-      }
-      const u = MOCK_USERS[role] || MOCK_USERS.student
-      setUser(u)
-      localStorage.setItem('rokkru_user', JSON.stringify(u))
-      localStorage.setItem('rokkru_token', 'mock-token')
-      return u
-    }
+    if (typeof credentialsOrRole === 'string') throw new Error('Role-only login is not supported')
 
-    if (isApiEnabled()) {
-      const u = await apiLogin(credentialsOrRole)
-      setUser(u)
-      return u
-    }
-
-    const role = credentialsOrRole.role || 'student'
-    const u = MOCK_USERS[role] || MOCK_USERS.student
+    const u = await apiLogin(credentialsOrRole)
     setUser(u)
-    localStorage.setItem('rokkru_user', JSON.stringify(u))
-    localStorage.setItem('rokkru_token', 'mock-token')
     return u
   }, [])
 
@@ -58,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, authLoading }}>
       {children}
     </AuthContext.Provider>
   )

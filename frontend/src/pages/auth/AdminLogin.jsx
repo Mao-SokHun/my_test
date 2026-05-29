@@ -6,9 +6,6 @@ import Button from '../../components/ui/Button'
 import AuthLayout from '@/components/layout/AuthLayout'
 import { useAuth } from '@/hooks'
 
-const MOCK_ADMIN_EMAIL = 'admin@rokkru.com'
-const MOCK_ADMIN_PASSWORD = 'admin123'
-
 const AdminLogin = () => {
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -22,14 +19,15 @@ const AdminLogin = () => {
     e.preventDefault()
     setError('')
     setLoading(true)
-    await new Promise((r) => setTimeout(r, 600))
-    if (email.trim().toLowerCase() === MOCK_ADMIN_EMAIL && password === MOCK_ADMIN_PASSWORD) {
-      login('admin')
+    try {
+      const user = await login({ email, password, role: 'admin' })
+      if (user?.role !== 'admin') throw new Error('This account is not authorized for admin access.')
       navigate('/admin', { replace: true })
-    } else {
+    } catch (err) {
       setError('Invalid credentials. Please check your email and password.')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
@@ -61,7 +59,7 @@ const AdminLogin = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input label="Admin Email" type="email" placeholder="admin@rokkru.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <Input label="Admin Email" type="email" placeholder="Enter admin email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <div>
           <label className="block text-xs font-semibold text-slate-600 mb-1.5">Password</label>
           <div className="relative">
@@ -83,11 +81,6 @@ const AdminLogin = () => {
           {loading ? 'Verifying…' : 'Sign In to Admin Panel'}
         </Button>
       </form>
-
-      <div className="mt-6 bg-slate-50 rounded-xl px-4 py-3 text-center">
-        <p className="text-xs text-slate-400">Demo credentials</p>
-        <p className="text-xs font-mono text-slate-600 mt-0.5">admin@rokkru.com / admin123</p>
-      </div>
     </AuthLayout>
   )
 }

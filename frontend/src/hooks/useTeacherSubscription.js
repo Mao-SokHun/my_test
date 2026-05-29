@@ -1,32 +1,35 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useLocation } from 'react-router-dom'
-import { getTeacherSubscription, hasPremiumAccess } from '../utils/teacherSubscription'
+import { fetchCurrentSubscription } from '@/services/subscriptionService'
 
-/** Keeps billing/subscription UI in sync with localStorage. */
 export const useTeacherSubscription = () => {
-  const location = useLocation()
-  const [subscription, setSubscription] = useState(getTeacherSubscription)
+  const [subscription, setSubscription] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const refresh = useCallback(() => {
-    setSubscription(getTeacherSubscription())
+    setLoading(true)
+    setError('')
+    fetchCurrentSubscription()
+      .then((data) => {
+        setSubscription(data?.data ?? data ?? null)
+      })
+      .catch((err) => {
+        setError(err.message || 'Failed to load subscription')
+        setSubscription(null)
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   useEffect(() => {
     refresh()
-  }, [location.pathname, refresh])
-
-  useEffect(() => {
-    const onStorage = (e) => {
-      if (e.key === 'rokkru_teacher_subscription') refresh()
-    }
-    window.addEventListener('storage', onStorage)
-    return () => window.removeEventListener('storage', onStorage)
   }, [refresh])
 
   return {
     subscription,
-    isPremium: hasPremiumAccess(subscription),
-    hasSubscription: subscription.plan === 'premium',
+    isPremium: subscription?.plan === 'premium',
+    hasSubscription: subscription?.plan === 'premium',
+    loading,
+    error,
     refresh,
     setSubscription,
   }

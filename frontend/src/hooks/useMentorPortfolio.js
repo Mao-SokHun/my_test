@@ -19,7 +19,12 @@ export function useMentorPortfolio(userId) {
   // Start load portfolio from API
   // ................................................
   const load = useCallback(async () => {
-    if (!userId || !isApiEnabled()) {
+    if (!userId) {
+      setItems([])
+      return
+    }
+    if (!isApiEnabled()) {
+      setError('Backend API is required to load portfolio.')
       setItems([])
       return
     }
